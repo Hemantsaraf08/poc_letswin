@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="./src/style.css">
     <title>Document</title>
 </head>
 <body>
     <div class="login-card">
-        <h1 class="app-name">Let's Win</h1>
-        <p class="description">Get COVID vaccine slot availability details of your Email based on your location</p>
+        <h1 class="app-name">Let's Win COVID</h1>
+        <p class="description">Get COVID vaccine slot availability sent to you based on your location</p>
         <form class="form" id="login" action="profile.html" method="POST">
             <div class="login-error-message"></div>
             <div class="form__input-group">
@@ -25,7 +26,7 @@
             <div class="form__input-group">
                 <input type="password" class="form__input" name="password" placeholder="Password" required>
             </div>
-            <div class="form__input-group">location</div>
+            <div class="form__input-group" id="location"></div>
             <button class="form__button" type="submit">Login</button>
         </form>
         <script src="./src/script.js"></script>
