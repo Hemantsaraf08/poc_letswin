@@ -1,0 +1,51 @@
+body {
+    --color-primary: #009579;
+    --color-primary-dark: #007f67;
+    --color-secondary: #252c6a;
+    --color-error: #cc3333;
+    --color-success: #4bb544;
+    --border-radius: 6px;
+
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: var(--color-primary);
+}
+.login-card{
+    width: 60vw;
+    margin: 1rem;
+    padding: 2rem;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+    border-radius: var(--border-radius);
+    background: #f0ecec;
+}
+.login-card,
+.form__input,
+.form__button{
+    font: 500 1rem 'Quicksand', sans-serif;
+}
+.description{
+    font: 1.25rem Georgia, serif;
+    text-align: center;
+}
+.app-name{
+    text-align: center;
+}
+.form__input-group{
+    margin-bottom: .6rem;
+}
+.form__input{
+    text-align: center;
+    display: block;
+    width: 60%;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    border-radius: var(--border-radius);
+    border: 1px solid #dddddd;
+    outline: none;
+    background: #eeeeee;
+    transition: background 0.2s, border-color 0.2s;
+}
