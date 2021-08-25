@@ -75,3 +75,6 @@ body {
 .form__button:active {
     transform: scale(0.98);
 }
+.form__button:disabled{
+    background-color: #cc3333;
+}
