@@ -6,6 +6,7 @@ const obj={
 }
 
 const puppeteer = require('puppeteer');
+const {tableObjMaker}=require("./driver");
 
 (async function () {
     try {
@@ -24,26 +25,24 @@ const puppeteer = require('puppeteer');
         await tab.waitForSelector(".agefilterblock");
         
         await tab.waitForSelector("div.mobile-hide");
+        
+        //check if slot is available
+        const numAvailable=await tab.$$eval("a.totalslts", atags=>atags.length);
+        
+        if(numAvailable){
+            //slots are available==> send mails stop cron job
+            
+            await tab.waitForSelector("li.availability-date");
+            //to send mail 
+            // first scrap the data into obj;
+            let selectors=["li.availability-date", "div.row-disp", "ul.slot-available-wrap", "a.totalslts"]
+            let tableObj=await tableObjMaker(tab, ...selectors);
 
-        //get distance from your location to railway station using getdist fn.
-        let dist2=await getdist(tab, "City Railway Station");
-        console.log(`
-        Approx. Distance from your location to Railway Station is ${dist2}
-        `);
+            // next use node mailer and build html string with obj data
+            let htmlstr=await htmltablebuilder(tableObj);
+            await mailsender(htmlstr)
 
-        //get info of Nearby public amenities listed in detailsOF array, calling fn gettabledetails for each amenity
-        await tab.waitForSelector("div[data-value='Nearby']");
-        await tab.click("button[data-value='Nearby']");
-        await tab.waitForNavigation({ visible: true, waitUntil: "networkidle0" });
-        for (let i = 0; i <= detailsOF.length; i++) {
-            if (i == 0) {
-                let detailsarr = await gettabledetails(tab, detailsOF[i]);
-            } else if (i == detailsOF.length) { }
-            else {
-                console.log(`Details of (top 5) ${detailsOF[i - 1]} are below:`);
-                let detailsarr = await gettabledetails(tab, detailsOF[i]);
-                console.table(detailsarr);
-            }
+            
         }
         await tab.waitForTimeout();
         await browser.close();
