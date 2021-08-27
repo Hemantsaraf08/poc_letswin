@@ -1,27 +1,32 @@
+
+
 const obj={
     name: "Hemant",
     age: 27,
-    Email: "hemantsaraf08@gmail.com",
-    pincode: 580030
+    email: "hemantsaraf08@gmail.com",
+    pincode: 110010
+    // no vaccine is available at 530068
 }
 
 const puppeteer = require('puppeteer');
-const {tableObjMaker}=require("./driver");
+const {tableObjMaker, htmltablebuilder}=require('./driver.js');
+const {mailsender}=require('./email.js');
 
-(async function () {
+
+module.exports.run=async function () {
     try {
-
+        
         let browser = await puppeteer.launch({
             defaultViewport: null,
-            headless: false,
+            headless: true,
             args: ["--start-maximized"]
         })
         let tab = await browser.newPage();
         await tab.goto("https://www.cowin.gov.in/");
-        await tab.waitForNavigation({ visible: true });
-        await tab.type("#mat-input-0", obj.pincode, { delay: 100 });
+        await tab.waitForTimeout(1000);
+        await tab.type("#mat-input-0", String(obj.pincode), { delay: 100 });
         await tab.keyboard.press("Enter");
-        await tab.waitForNavigation({ visible: true, waitUntil: "networkidle0" });
+
         await tab.waitForSelector(".agefilterblock");
         
         await tab.waitForSelector("div.mobile-hide");
@@ -39,14 +44,19 @@ const {tableObjMaker}=require("./driver");
             let tableObj=await tableObjMaker(tab, ...selectors);
 
             // next use node mailer and build html string with obj data
-            let htmlstr=await htmltablebuilder(tableObj);
-            await mailsender(htmlstr)
-
-            
+            let tablestr=await htmltablebuilder(tableObj);
+            let htmlstr=`
+            <h2>Dear ${obj.name},</h2>
+            <h4>Below are the details of Vaccine dose available based on your pincode: ${obj.pincode}</h4>
+            ${tablestr}
+            <h4>Thanks for using LetsWin Covid</h4>
+            `
+            await mailsender(obj.email, htmlstr);
+            // console.log(htmlstr)          
         }
         await tab.waitForTimeout();
         await browser.close();
     } catch (err) {
         console.log(err);
     }
-})();
+};

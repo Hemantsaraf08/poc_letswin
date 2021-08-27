@@ -1,18 +1,18 @@
-module.exports={tableObjMaker};
+
 async function tableObjMaker(tab, datesSelector, centerNameSelector, vaccineRowsSelector, vaccineQtySelector) {
     let tableObj = {}
-
+    
     let headerArr = await tab.evaluate(getHeaderArr, datesSelector);
     headerArr.unshift("Vaccine Center Details")
     tableObj.header = headerArr;
-
+    
     let cDetails = await tab.evaluate(getCenterArr, centerNameSelector);
     tableObj.centerNames=cDetails;
-
+    
     let vaccinesDetails=await tab.evaluate(getVaccineDetails, vaccineRowsSelector, vaccineQtySelector);
     tableObj.vaccinesDetails=vaccinesDetails;
-
-
+    
+    
     return tableObj;
 }
 
@@ -38,21 +38,22 @@ function getCenterArr(centerNameSelector) {
     return cDetails;
 }
 
-function getVaccineDetails(vaccineRowsSelector, vaccineQtySelector){
+async function getVaccineDetails(vaccineRowsSelector, vaccineQtySelector){
     let vaccines=[];
-    let ulTags=document.querySelectorAll(vaccineRowsSelector);
+    var ulTags=document.querySelectorAll(vaccineRowsSelector);
     for(let i=0;i<ulTags.length;i++){
         let day=[];
         for(let j=0;j<7;j++){
             let str="";
-            let temp=ulTags[i].childNodes[j].querySelectorAll(vaccineQtySelector);
-            if(temp){
-                for(let k=0;k<temp.length;k++){
+            let node=ulTags[i].children[j];
+            console.log(node);
+            let temp=node?.querySelectorAll(vaccineQtySelector);
+            console.log(temp);
+            if(temp?.length!==0){
+                for(let k=0;k<temp?.length;k++){
                     str+=temp[k].parentElement.previousElementSibling.innerText;
                     str+="-"+ temp[k].innerText+"; "
                 }
-            }else{
-                str+="NA"
             }
             day[j]=str;
         }
@@ -68,14 +69,16 @@ function htmltablebuilder(tableObj){
     <thead>
     ${headertext}
     </thead>
+    <hr>
     <tbody>
     ${bodytext}
     </tbody>
+    <hr>
     <tfoot>
     </tfoot>
-</table>
+    </table>
     `
-
+    
     return htmlstr;
 }
 
@@ -94,14 +97,19 @@ function bodytxt(tableObj){
     let allrows="";
     for(let i=0;i<centerNames.length;i++){
         let tmeprow="";
+        let currRow=vaccinesDetails[i];
         for(let j=0;j<header.length;j++){
             if(j==0){
                 let text=`<td>${centerNames[i]}</td>`
                 tmeprow+=text;
             }else{
-                
+                let temp=`<td>${currRow[j-1]}</td>`
+                tmeprow+=temp;
             }
         }
+        allrows+=`<tr>${tmeprow}</tr><hr>`
     }
-
+    return allrows;
 }
+
+module.exports={tableObjMaker, htmltablebuilder};
